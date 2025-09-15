@@ -1,0 +1,24 @@
+{
+  "name": "halo-utils",
+  "version": "1.0.0",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build:win": "rmdir /s /q dist && tsup",
+    "build:linux": "rm -rf dist && tsup"
+  },
+  "keywords": ["utils", "typescript", "nodejs", "library"],
+  "author": "cocoth",
+  "license": "ISC",
+  "description": "A utility library for Node.js projects",
+  "dependencies": {
+    "chokidar": "^4.0.3",
+    "dotenv": "^17.2.2",
+    "tsx": "^4.20.5",
+    "typescript": "^5.9.2"
+  },
+  "devDependencies": {
+    "@types/node": "^24.4.0",
+    "tsup": "^8.5.0"
+  }
+}
