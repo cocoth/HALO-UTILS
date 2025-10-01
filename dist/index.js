@@ -927,7 +927,6 @@ var Logger = class {
 // src/terminal/terminalinteractive.ts
 var import_readline = require("readline");
 var import_dotenv = __toESM(require("dotenv"));
-import_dotenv.default.config();
 var Terminal = class _Terminal {
   static instance;
   readlineInterface;
@@ -1000,9 +999,14 @@ var Terminal = class _Terminal {
   /**
    * Parses environment variables that start with a given prefix.
    * @param prefix The prefix to filter environment variables.
+   * @param options Optional dotenv configuration options.
    * @returns An object containing arrays of keys and values.
    */
-  envParser(prefix) {
+  envParser(prefix, options) {
+    import_dotenv.default.config({
+      quiet: true,
+      ...options
+    });
     const envKeys = Object.keys(process.env).filter(
       (key) => key.startsWith(prefix)
     );

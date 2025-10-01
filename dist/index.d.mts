@@ -1,4 +1,5 @@
 import { FSWatcherKnownEventMap } from 'chokidar';
+import dotenv from 'dotenv';
 
 /**
  * TerminalColor type definitions for ANSI escape codes and color functions.
@@ -477,9 +478,10 @@ declare class Terminal {
     /**
      * Parses environment variables that start with a given prefix.
      * @param prefix The prefix to filter environment variables.
+     * @param options Optional dotenv configuration options.
      * @returns An object containing arrays of keys and values.
      */
-    envParser(prefix: string): {
+    envParser(prefix: string, options?: dotenv.DotenvConfigOptions): {
         keys: string[];
         values: string[];
     };
