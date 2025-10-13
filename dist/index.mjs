@@ -980,12 +980,863 @@ var Terminal = class _Terminal {
   }
 };
 var terminal = new Terminal();
+
+// src/metadata/userAgentParser.ts
+var UAParser = class _UAParser {
+  userAgent;
+  // Browser patterns with engine detection
+  static browserPatterns = [
+    // Modern browsers first (more specific)
+    { name: "Edge", pattern: /\bEdg\/([\d\.]+)/, engine: "Blink" },
+    { name: "Chrome", pattern: /\bChrome\/([\d\.]+)/, engine: "Blink" },
+    { name: "Firefox", pattern: /\bFirefox\/([\d\.]+)/, engine: "Gecko" },
+    { name: "Safari", pattern: /\bVersion\/([\d\.]+).*Safari/, engine: "WebKit" },
+    { name: "Opera", pattern: /\bOPR\/([\d\.]+)/, engine: "Blink" },
+    { name: "Opera", pattern: /\bOpera\/([\d\.]+)/, engine: "Presto" },
+    { name: "Samsung Browser", pattern: /\bSamsungBrowser\/([\d\.]+)/, engine: "Blink" },
+    { name: "UC Browser", pattern: /\bUCBrowser\/([\d\.]+)/, engine: "WebKit" },
+    { name: "Brave", pattern: /\bBrave\/([\d\.]+)/, engine: "Blink" },
+    { name: "Vivaldi", pattern: /\bVivaldi\/([\d\.]+)/, engine: "Blink" },
+    // Legacy browsers
+    { name: "Internet Explorer", pattern: /\bMSIE\s([\d\.]+)/, engine: "Trident" },
+    { name: "Internet Explorer", pattern: /\bTrident.*rv:([\d\.]+)/, engine: "Trident" },
+    // Mobile browsers
+    { name: "Mobile Safari", pattern: /\bMobile.*Safari\/([\d\.]+)/, engine: "WebKit" },
+    { name: "Chrome Mobile", pattern: /\bCrMo\/([\d\.]+)/, engine: "Blink" },
+    { name: "Chrome Mobile", pattern: /\bCriOS\/([\d\.]+)/, engine: "WebKit" },
+    { name: "Firefox Mobile", pattern: /\bFxiOS\/([\d\.]+)/, engine: "WebKit" },
+    // Webview and embedded
+    { name: "Android WebView", pattern: /\bwv\).*Chrome\/([\d\.]+)/, engine: "Blink" },
+    { name: "WebView", pattern: /\bWebView\/([\d\.]+)/, engine: "WebKit" }
+  ];
+  // Operating System patterns
+  static osPatterns = [
+    // Desktop OS
+    { name: "Windows 11", pattern: /Windows NT 10\.0.*\b(22000|22621|22631)\b/ },
+    { name: "Windows 10", pattern: /Windows NT 10\.0/ },
+    { name: "Windows 8.1", pattern: /Windows NT 6\.3/ },
+    { name: "Windows 8", pattern: /Windows NT 6\.2/ },
+    { name: "Windows 7", pattern: /Windows NT 6\.1/ },
+    { name: "Windows Vista", pattern: /Windows NT 6\.0/ },
+    { name: "Windows XP", pattern: /Windows NT 5\.1/ },
+    // macOS versions
+    { name: "macOS Sonoma", pattern: /Mac OS X 10[._]15|macOS.*14[._]\d+/ },
+    { name: "macOS Ventura", pattern: /Mac OS X 10[._]15|macOS.*13[._]\d+/ },
+    { name: "macOS Monterey", pattern: /Mac OS X 10[._]15|macOS.*12[._]\d+/ },
+    { name: "macOS Big Sur", pattern: /Mac OS X 10[._]15|macOS.*11[._]\d+/ },
+    { name: "macOS Catalina", pattern: /Mac OS X 10[._]15/ },
+    { name: "macOS Mojave", pattern: /Mac OS X 10[._]14/ },
+    { name: "macOS High Sierra", pattern: /Mac OS X 10[._]13/ },
+    { name: "macOS Sierra", pattern: /Mac OS X 10[._]12/ },
+    { name: "Mac OS X", pattern: /Mac OS X ([\d\._]+)/ },
+    // Linux distributions
+    { name: "Ubuntu", pattern: /Ubuntu/ },
+    { name: "Debian", pattern: /Debian/ },
+    { name: "CentOS", pattern: /CentOS/ },
+    { name: "Red Hat", pattern: /Red Hat/ },
+    { name: "Fedora", pattern: /Fedora/ },
+    { name: "SUSE", pattern: /SUSE/ },
+    { name: "Arch Linux", pattern: /Arch/ },
+    { name: "Linux", pattern: /Linux/ },
+    // Mobile OS
+    { name: "iOS", pattern: /(?:iPhone|iPad|iPod).*OS ([\d_]+)/ },
+    { name: "Android", pattern: /Android ([\d\.]+)/ },
+    { name: "Windows Phone", pattern: /Windows Phone ([\d\.]+)/ },
+    { name: "BlackBerry", pattern: /BlackBerry|BB10/ },
+    // Other OS
+    { name: "Chrome OS", pattern: /CrOS/ },
+    { name: "FreeBSD", pattern: /FreeBSD/ },
+    { name: "OpenBSD", pattern: /OpenBSD/ },
+    { name: "NetBSD", pattern: /NetBSD/ },
+    { name: "Solaris", pattern: /SunOS/ }
+  ];
+  // Device patterns
+  static devicePatterns = [
+    // Smartphones
+    { type: "mobile", vendor: "Apple", pattern: /iPhone/ },
+    { type: "mobile", vendor: "Samsung", pattern: /SM-[A-Z]\d+/ },
+    { type: "mobile", vendor: "Google", pattern: /Pixel/ },
+    { type: "mobile", vendor: "OnePlus", pattern: /OnePlus/ },
+    { type: "mobile", vendor: "Xiaomi", pattern: /Mi\s|Redmi/ },
+    { type: "mobile", vendor: "Huawei", pattern: /HUAWEI|Honor/ },
+    { type: "mobile", vendor: "LG", pattern: /LG-/ },
+    { type: "mobile", vendor: "Sony", pattern: /Sony/ },
+    { type: "mobile", vendor: "HTC", pattern: /HTC/ },
+    { type: "mobile", vendor: "Motorola", pattern: /Moto/ },
+    // Tablets
+    { type: "tablet", vendor: "Apple", pattern: /iPad/ },
+    { type: "tablet", vendor: "Samsung", pattern: /SM-T/ },
+    { type: "tablet", vendor: "Amazon", pattern: /Kindle|KFAPWI/ },
+    { type: "tablet", vendor: "Microsoft", pattern: /Surface/ },
+    // Smart TVs
+    { type: "smarttv", vendor: "Samsung", pattern: /SMART-TV|SmartTV/ },
+    { type: "smarttv", vendor: "LG", pattern: /webOS/ },
+    { type: "smarttv", vendor: "Sony", pattern: /SonyDTV/ },
+    // Gaming consoles
+    { type: "console", vendor: "Sony", pattern: /PlayStation/ },
+    { type: "console", vendor: "Microsoft", pattern: /Xbox/ },
+    { type: "console", vendor: "Nintendo", pattern: /Nintendo/ },
+    // Wearables
+    { type: "wearable", vendor: "Apple", pattern: /Watch/ },
+    { type: "wearable", vendor: "Samsung", pattern: /SM-R/ }
+  ];
+  // Bot patterns
+  static botPatterns = [
+    /bot|crawler|spider|crawling/i,
+    /googlebot|bingbot|slurp|duckduckbot/i,
+    /facebookexternalhit|twitterbot|linkedinbot/i,
+    /whatsapp|telegram|discord/i,
+    /headless|phantom|selenium|webdriver/i
+  ];
+  // CPU Architecture patterns
+  static cpuPatterns = [
+    { arch: "amd64", pattern: /(?:amd64|x86_64|win64|wow64)/i },
+    { arch: "ia32", pattern: /(?:i[346]86|x86)/i },
+    { arch: "arm64", pattern: /(?:arm64|aarch64)/i },
+    { arch: "arm", pattern: /arm/i },
+    { arch: "mips", pattern: /mips/i },
+    { arch: "sparc", pattern: /sparc/i },
+    { arch: "ppc", pattern: /ppc|powerpc/i }
+  ];
+  constructor(userAgent) {
+    this.userAgent = userAgent || (typeof navigator !== "undefined" ? navigator.userAgent : "");
+  }
+  /**
+   * Parse the user agent string and return detailed information
+   */
+  getResult() {
+    const browser = this.parseBrowser();
+    const os = this.parseOS();
+    const device = this.parseDevice();
+    const cpu = this.parseCPU();
+    const extra = this.parseExtra();
+    return {
+      browser,
+      os,
+      device,
+      cpu,
+      extra
+    };
+  }
+  /**
+   * Parse browser information
+   */
+  parseBrowser() {
+    for (const browser of _UAParser.browserPatterns) {
+      const match = this.userAgent.match(browser.pattern);
+      if (match) {
+        const version = match[1] || null;
+        const major = version ? version.split(".")[0] : null;
+        return {
+          name: browser.name,
+          version,
+          major,
+          engine: browser.engine
+        };
+      }
+    }
+    return {
+      name: null,
+      version: null,
+      major: null,
+      engine: null
+    };
+  }
+  /**
+   * Parse operating system information
+   */
+  parseOS() {
+    for (const os of _UAParser.osPatterns) {
+      const match = this.userAgent.match(os.pattern);
+      if (match) {
+        const version = match[1] ? match[1].replace(/_/g, ".") : null;
+        return {
+          name: os.name,
+          version,
+          versionName: this.getOSVersionName(os.name, version)
+        };
+      }
+    }
+    return {
+      name: null,
+      version: null,
+      versionName: null
+    };
+  }
+  /**
+   * Parse device information
+   */
+  parseDevice() {
+    for (const device of _UAParser.devicePatterns) {
+      if (device.pattern.test(this.userAgent)) {
+        const model = this.extractDeviceModel(device.vendor, device.type);
+        return {
+          type: device.type,
+          vendor: device.vendor,
+          model
+        };
+      }
+    }
+    const isMobile = /Mobile|Android|iPhone|iPad/i.test(this.userAgent);
+    return {
+      type: isMobile ? "mobile" : "desktop",
+      vendor: null,
+      model: null
+    };
+  }
+  /**
+   * Parse CPU architecture
+   */
+  parseCPU() {
+    for (const cpu of _UAParser.cpuPatterns) {
+      if (cpu.pattern.test(this.userAgent)) {
+        return {
+          architecture: cpu.arch
+        };
+      }
+    }
+    return {
+      architecture: null
+    };
+  }
+  /**
+   * Parse extra information and flags
+   */
+  parseExtra() {
+    const isMobile = /Mobile|Android|iPhone|BlackBerry|Windows Phone/i.test(this.userAgent);
+    const isTablet = /iPad|Tablet|Kindle/i.test(this.userAgent);
+    const isTV = /TV|webOS|Tizen|SmartTV/i.test(this.userAgent);
+    const isWearable = /Watch|Wear/i.test(this.userAgent);
+    const isConsole = /PlayStation|Xbox|Nintendo/i.test(this.userAgent);
+    const isEmbedded = /Embedded|IoT|Smart/i.test(this.userAgent);
+    const isBot = _UAParser.botPatterns.some((pattern) => pattern.test(this.userAgent));
+    const isDesktop = !isMobile && !isTablet && !isTV && !isWearable && !isConsole && !isEmbedded;
+    return {
+      isMobile,
+      isTablet,
+      isDesktop,
+      isBot,
+      isTV,
+      isWearable,
+      isConsole,
+      isEmbedded
+    };
+  }
+  /**
+   * Get OS version name based on version number
+   */
+  getOSVersionName(osName, version) {
+    if (!osName || !version) return null;
+    const versionNames = {
+      "iOS": {
+        "17": "iOS 17",
+        "16": "iOS 16",
+        "15": "iOS 15",
+        "14": "iOS 14",
+        "13": "iOS 13"
+      },
+      "Android": {
+        "14": "Android 14",
+        "13": "Android 13 Tiramisu",
+        "12": "Android 12",
+        "11": "Android 11",
+        "10": "Android 10 Q"
+      }
+    };
+    const majorVersion = version.split(".")[0];
+    return versionNames[osName]?.[majorVersion] || null;
+  }
+  /**
+   * Extract device model from user agent
+   */
+  extractDeviceModel(vendor, type) {
+    if (!vendor) return null;
+    if (vendor === "Samsung") {
+      const match = this.userAgent.match(/SM-[A-Z]\d+[A-Z]?/);
+      return match ? match[0] : null;
+    }
+    if (vendor === "Apple") {
+      if (type === "mobile") {
+        const match = this.userAgent.match(/iPhone\d+,\d+/);
+        return match ? match[0] : "iPhone";
+      }
+      if (type === "tablet") {
+        const match = this.userAgent.match(/iPad\d+,\d+/);
+        return match ? match[0] : "iPad";
+      }
+    }
+    if (vendor === "Google") {
+      const match = this.userAgent.match(/Pixel \d+[a-zA-Z]*/);
+      return match ? match[0] : null;
+    }
+    return null;
+  }
+  /**
+   * Get detailed browser information
+   */
+  getBrowser() {
+    return this.getResult().browser;
+  }
+  /**
+   * Get detailed OS information
+   */
+  getOS() {
+    return this.getResult().os;
+  }
+  /**
+   * Get detailed device information
+   */
+  getDevice() {
+    return this.getResult().device;
+  }
+  /**
+   * Get CPU architecture information
+   */
+  getCPU() {
+    return this.getResult().cpu;
+  }
+  /**
+   * Check if device is mobile
+   */
+  isMobile() {
+    return this.getResult().extra.isMobile;
+  }
+  /**
+   * Check if device is tablet
+   */
+  isTablet() {
+    return this.getResult().extra.isTablet;
+  }
+  /**
+   * Check if device is desktop
+   */
+  isDesktop() {
+    return this.getResult().extra.isDesktop;
+  }
+  /**
+   * Check if user agent is a bot
+   */
+  isBot() {
+    return this.getResult().extra.isBot;
+  }
+  /**
+   * Get formatted string representation
+   */
+  toString() {
+    const result = this.getResult();
+    const parts = [];
+    if (result.browser.name) {
+      parts.push(`${result.browser.name} ${result.browser.version || ""}`);
+    }
+    if (result.os.name) {
+      parts.push(`on ${result.os.name} ${result.os.version || ""}`);
+    }
+    if (result.device.vendor && result.device.model) {
+      parts.push(`(${result.device.vendor} ${result.device.model})`);
+    } else if (result.device.type && result.device.type !== "desktop") {
+      parts.push(`(${result.device.type})`);
+    }
+    return parts.join(" ").trim();
+  }
+  /**
+   * Set user agent string
+   */
+  setUA(userAgent) {
+    this.userAgent = userAgent;
+    return this;
+  }
+  /**
+   * Get current user agent string
+   */
+  getUA() {
+    return this.userAgent;
+  }
+  /**
+   * Static method to quickly parse user agent
+   */
+  static parse(userAgent) {
+    return new _UAParser(userAgent).getResult();
+  }
+};
+
+// src/metadata/metadata.ts
+function parseUserAgent(userAgent) {
+  const parser = new UAParser(userAgent);
+  const result = parser.getResult();
+  return {
+    browser: result.browser.name || null,
+    browserVersion: result.browser.version || null,
+    operatingSystem: result.os.name || null,
+    osVersion: result.os.version || null,
+    deviceType: result.device.type || "desktop",
+    deviceBrand: result.device.vendor || null,
+    deviceModel: result.device.model || null,
+    isMobile: result.extra.isMobile,
+    isBot: result.extra.isBot
+  };
+}
+function getIpInfo(request) {
+  const forwarded = request.headers.get("x-forwarded-for");
+  const realIp = request.headers.get("x-real-ip");
+  const cfConnectingIp = request.headers.get("cf-connecting-ip");
+  const url = new URL(request.url);
+  const ip = forwarded?.split(",")[0]?.trim() || realIp || cfConnectingIp || url.hostname || "unknown";
+  const ipv4Regex = /^(\d{1,3}\.){3}\d{1,3}$/;
+  const ipv6Regex = /^([0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}$/;
+  let ipVersion = "unknown";
+  if (ipv4Regex.test(ip)) {
+    ipVersion = "IPv4";
+  } else if (ipv6Regex.test(ip)) {
+    ipVersion = "IPv6";
+  }
+  return { ip, ipVersion };
+}
+async function getLocationFromIP(ip) {
+  try {
+    const response = await fetch(`http://ip-api.com/json/${ip}`);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const data = await response.json();
+    if (data.status === "success") {
+      return {
+        country: data.country,
+        countryCode: data.countryCode,
+        region: data.region,
+        regionName: data.regionName,
+        city: data.city,
+        zip: data.zip,
+        lat: data.lat,
+        lon: data.lon,
+        timezone: data.timezone,
+        isp: data.isp,
+        org: data.org
+      };
+    }
+  } catch (error) {
+    throw error;
+  }
+}
+function generateFingerprint(request, device) {
+  const components = [
+    device.browser,
+    device.operatingSystem,
+    request.headers.get("accept-language"),
+    request.headers.get("accept-encoding"),
+    device.deviceType
+  ].filter(Boolean);
+  return Buffer.from(components.join("|")).toString("base64");
+}
+function getSessionId(request) {
+  const cookieHeader = request.headers.get("cookie");
+  if (cookieHeader) {
+    const cookies = cookieHeader.split(";").reduce((acc, cookie) => {
+      const [name, value] = cookie.trim().split("=");
+      acc[name] = value;
+      return acc;
+    }, {});
+    const sessionCookie = cookies["session-id"];
+    if (sessionCookie) return sessionCookie;
+  }
+  return `sess_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
+}
+function getReferrerDomain(referrer) {
+  if (!referrer) return void 0;
+  try {
+    const url = new URL(referrer);
+    return url.hostname;
+  } catch {
+    return void 0;
+  }
+}
+async function collectAnalytics(request) {
+  try {
+    const userAgent = request.headers.get("user-agent") || "";
+    const referrer = request.headers.get("referer") || void 0;
+    const { ip, ipVersion } = getIpInfo(request);
+    const device = parseUserAgent(userAgent);
+    const sessionId = getSessionId(request);
+    const fingerprint = generateFingerprint(request, device);
+    if (device.isBot) {
+      return;
+    }
+    const location = await getLocationFromIP(ip);
+    const referrerDomain = getReferrerDomain(referrer);
+    const url = new URL(request.url);
+    const metadata = {
+      // IP and Location
+      ip,
+      ipVersion,
+      country: location?.country,
+      countryCode: location?.countryCode,
+      region: location?.region,
+      regionName: location?.regionName,
+      city: location?.city,
+      zip: location?.zip,
+      latitude: location?.lat,
+      longitude: location?.lon,
+      timezone: location?.timezone,
+      isp: location?.isp,
+      organization: location?.org,
+      // User Agent and Device
+      userAgent,
+      browser: device.browser,
+      browserVersion: device.browserVersion,
+      operatingSystem: device.operatingSystem,
+      osVersion: device.osVersion,
+      deviceType: device.deviceType,
+      deviceBrand: device.deviceBrand,
+      deviceModel: device.deviceModel,
+      isMobile: device.isMobile,
+      isBot: device.isBot,
+      // Request Headers
+      acceptLanguage: request.headers.get("accept-language"),
+      acceptEncoding: request.headers.get("accept-encoding"),
+      acceptCharset: request.headers.get("accept-charset"),
+      cacheControl: request.headers.get("cache-control"),
+      connection: request.headers.get("connection"),
+      dnt: request.headers.get("dnt"),
+      upgradeInsecure: request.headers.get("upgrade-insecure-requests"),
+      // Referrer and Session
+      referrer: referrer || null,
+      referrerDomain: referrerDomain || null,
+      sessionId,
+      fingerprint,
+      // Request Details
+      requestMethod: request.method,
+      requestUrl: request.url,
+      requestPath: url.pathname,
+      queryParams: JSON.stringify(Object.fromEntries(url.searchParams)),
+      protocol: url.protocol,
+      port: url.port ? parseInt(url.port) : null,
+      createdAt: /* @__PURE__ */ new Date()
+    };
+    return metadata;
+  } catch (error) {
+    throw new Error("Error collecting analytics data");
+  }
+}
+
+// src/metadata/geolocation.ts
+var FetchGeolocation = class {
+  ips = /* @__PURE__ */ new Set();
+  failedIPs = /* @__PURE__ */ new Set();
+  isProcessing = false;
+  lastRequestTime = 0;
+  requestCount = 0;
+  RATE_LIMIT_WINDOW = 6e4;
+  MAX_REQUESTS_PER_MINUTE = 45;
+  debug = false;
+  currentErrors = /* @__PURE__ */ new Map();
+  setDebug(enabled) {
+    this.debug = enabled;
+  }
+  debugLog(message) {
+    if (this.debug) console.log(message);
+  }
+  debugUpdate(message) {
+    if (this.debug) {
+      const maxLength = 80;
+      const truncated = message.length > maxLength ? message.substring(0, maxLength - 3) + "..." : message;
+      process.stdout.write("\r" + truncated);
+    }
+  }
+  debugComplete(message) {
+    if (this.debug) {
+      process.stdout.write("\r" + " ".repeat(100) + "\r" + message + "\n");
+    }
+  }
+  debugError(ip, error, clear = false) {
+    if (!this.debug) return;
+    if (clear) {
+      this.currentErrors.delete(ip);
+    } else {
+      const currentError = this.currentErrors.get(ip);
+      if (currentError === error) return;
+      this.currentErrors.set(ip, error);
+    }
+    if (this.currentErrors.size > 0) {
+      const errorEntries = Array.from(this.currentErrors.entries());
+      const maxDisplay = 3;
+      const displayErrors = errorEntries.slice(0, maxDisplay);
+      const remainingCount = errorEntries.length - maxDisplay;
+      let errorText = displayErrors.map(([ip2, err]) => `${ip2}(${err})`).join(", ");
+      if (remainingCount > 0) {
+        errorText += `, +${remainingCount} more`;
+      }
+      process.stdout.write("\r" + " ".repeat(100) + "\r");
+      this.debugUpdate(`\u274C ${errorText}`);
+    } else {
+      process.stdout.write("\r" + " ".repeat(100) + "\r");
+    }
+  }
+  addIPs(ips) {
+    for (const ip of ips) {
+      if (this.isValidIP(ip)) {
+        this.ips.add(ip);
+        this.failedIPs.delete(ip);
+      }
+    }
+  }
+  addIP(ip) {
+    if (this.isValidIP(ip)) {
+      this.ips.add(ip);
+      this.failedIPs.delete(ip);
+    }
+  }
+  getIPs() {
+    return Array.from(this.ips);
+  }
+  getFailedIPs() {
+    return Array.from(this.failedIPs);
+  }
+  clearIPs() {
+    this.ips.clear();
+    this.failedIPs.clear();
+  }
+  clearSuccessfulIPs() {
+    this.ips.clear();
+  }
+  isValidIP(ip) {
+    return /^(\d{1,3}\.){3}\d{1,3}$/.test(ip) || /^([0-9a-fA-F:]+)$/.test(ip);
+  }
+  async waitForRateLimit() {
+    const now = Date.now();
+    const timeSinceLastRequest = now - this.lastRequestTime;
+    if (timeSinceLastRequest > this.RATE_LIMIT_WINDOW) {
+      this.requestCount = 0;
+    }
+    if (this.requestCount >= this.MAX_REQUESTS_PER_MINUTE) {
+      const waitTime = this.RATE_LIMIT_WINDOW - timeSinceLastRequest;
+      if (waitTime > 0) {
+        await this.sleepWithCountdown(waitTime, this.requestCount, this.MAX_REQUESTS_PER_MINUTE);
+        this.requestCount = 0;
+        if (this.debug) {
+          process.stdout.write("\r" + " ".repeat(100) + "\r");
+        }
+      } else {
+        this.requestCount = 0;
+      }
+    }
+  }
+  sleep(ms) {
+    return new Promise((resolve2) => setTimeout(resolve2, ms));
+  }
+  async sleepWithCountdown(totalMs, usedRequests, maxRequests) {
+    return new Promise((resolve2) => {
+      const startTime = Date.now();
+      let lastDisplayedSeconds = -1;
+      const updateCountdown = () => {
+        const elapsed = Date.now() - startTime;
+        const remaining = Math.max(0, totalMs - elapsed);
+        const remainingSeconds = Math.ceil(remaining / 1e3);
+        if (remaining <= 0) {
+          clearInterval(interval);
+          if (this.debug) {
+            process.stdout.write("\r" + " ".repeat(100) + "\r");
+            this.debugComplete(`\u2705 Rate limit reset, continuing...`);
+          }
+          resolve2();
+          return;
+        }
+        if (remainingSeconds !== lastDisplayedSeconds) {
+          lastDisplayedSeconds = remainingSeconds;
+          const totalSeconds = Math.ceil(totalMs / 1e3);
+          const progressPercent = Math.round((totalSeconds - remainingSeconds) / totalSeconds * 100);
+          const progressBar = "\u2588".repeat(Math.floor(progressPercent / 5)) + "\u2591".repeat(20 - Math.floor(progressPercent / 5));
+          this.debugUpdate(`\u23F3 Rate limit: ${remainingSeconds}s [${progressBar}] ${progressPercent}%`);
+        }
+      };
+      updateCountdown();
+      const interval = setInterval(updateCountdown, 200);
+      setTimeout(() => {
+        clearInterval(interval);
+        if (this.debug) {
+          process.stdout.write("\r" + " ".repeat(100) + "\r");
+          this.debugComplete(`\u2705 Rate limit reset, continuing...`);
+        }
+        resolve2();
+      }, totalMs);
+    });
+  }
+  async processIP(ip, timeout, maxRetries) {
+    let attempts = 0;
+    while (attempts < maxRetries) {
+      try {
+        await this.waitForRateLimit();
+        this.requestCount++;
+        this.lastRequestTime = Date.now();
+        const adjustedTimeout = timeout + attempts * 2e3;
+        const timeoutPromise = new Promise((_, reject) => {
+          setTimeout(() => reject(new Error("Request timeout")), adjustedTimeout);
+        });
+        const data = await Promise.race([
+          getLocationFromIP(ip),
+          timeoutPromise
+        ]);
+        this.debugError(ip, "", true);
+        this.ips.delete(ip);
+        this.failedIPs.delete(ip);
+        return { ip, data };
+      } catch (error) {
+        attempts++;
+        const errorMsg = error instanceof Error ? error.message : "Unknown error";
+        this.debugError(ip, `${errorMsg} (${attempts}/${maxRetries})`);
+        if (attempts >= maxRetries) {
+          this.failedIPs.add(ip);
+          return { ip, error: `${errorMsg} (${maxRetries} attempts)` };
+        }
+        await this.sleep(Math.min(1e3 * Math.pow(2, attempts), 5e3));
+      }
+    }
+    this.failedIPs.add(ip);
+    return { ip, error: "Max retries exceeded" };
+  }
+  async bulkRequest(options = {}) {
+    const {
+      batchSize = 40,
+      batchDelay = 65e3,
+      autoRetry = true,
+      maxAutoRetries = 2,
+      debug = false
+    } = options;
+    let requestTimeout = options.requestTimeout || 1e4;
+    let maxRetries = options.maxRetries || 2;
+    this.debug = debug;
+    if (this.isProcessing) {
+      throw new Error("Bulk request already in progress");
+    }
+    this.isProcessing = true;
+    const startTime = Date.now();
+    const allIPs = this.getIPs();
+    const result = {
+      success: [],
+      failed: [],
+      stats: {
+        total: allIPs.length,
+        successful: 0,
+        failed: 0,
+        duration: 0,
+        batchesProcessed: 0
+      }
+    };
+    try {
+      this.currentErrors.clear();
+      let currentRetryRound = 0;
+      while (currentRetryRound <= maxAutoRetries) {
+        const currentIPs = this.getIPs();
+        if (currentIPs.length === 0) break;
+        if (currentRetryRound > 0 && debug) {
+          this.debugLog(`\u{1F504} Auto-retry ${currentRetryRound}/${maxAutoRetries}: ${currentIPs.length} IPs`);
+        }
+        const batches = [];
+        for (let i = 0; i < currentIPs.length; i += batchSize) {
+          batches.push(currentIPs.slice(i, i + batchSize));
+        }
+        if (currentRetryRound === 0 && debug) {
+          this.debugLog(`\u{1F680} Processing ${currentIPs.length} IPs in ${batches.length} batches`);
+        }
+        for (let batchIndex = 0; batchIndex < batches.length; batchIndex++) {
+          const batch = batches[batchIndex];
+          const batchStartTime = Date.now();
+          if (debug) {
+            this.debugUpdate(`\u{1F4E6} Batch ${batchIndex + 1}/${batches.length}...`);
+          }
+          const batchResults = await Promise.all(
+            batch.map((ip) => this.processIP(ip, requestTimeout, maxRetries))
+          );
+          for (const batchResult of batchResults) {
+            if (batchResult.error) {
+              const existingFailed = result.failed.find((f) => f.ip === batchResult.ip);
+              if (!existingFailed) {
+                result.failed.push({
+                  ip: batchResult.ip,
+                  error: batchResult.error
+                });
+              }
+            } else if (batchResult.data) {
+              result.failed = result.failed.filter((f) => f.ip !== batchResult.ip);
+              const existingSuccess = result.success.find((s) => s.ip === batchResult.ip);
+              if (!existingSuccess) {
+                result.success.push({
+                  ip: batchResult.ip,
+                  data: batchResult.data
+                });
+              }
+            }
+          }
+          result.stats.batchesProcessed++;
+          const batchDuration = Date.now() - batchStartTime;
+          if (debug) {
+            this.debugComplete(`\u2705 Batch ${batchIndex + 1}/${batches.length} (${batchDuration}ms)`);
+          }
+          if (this.debug && this.currentErrors.size > 0) {
+            this.debugUpdate("");
+          }
+          if (batchIndex < batches.length - 1) {
+            await this.sleep(batchDelay);
+          }
+        }
+        if (!autoRetry || this.failedIPs.size === 0) break;
+        currentRetryRound++;
+        if (currentRetryRound <= maxAutoRetries) {
+          requestTimeout = Math.min(requestTimeout * 1.5, 15e3);
+          maxRetries = Math.min(maxRetries + 1, 4);
+          const failedIPsArray = Array.from(this.failedIPs);
+          this.addIPs(failedIPsArray);
+          await this.sleep(1e3);
+        }
+      }
+      this.currentErrors.clear();
+      if (this.debug) {
+        this.debugUpdate("");
+      }
+      result.stats.successful = result.success.length;
+      result.stats.failed = result.failed.length;
+      result.stats.duration = Date.now() - startTime;
+      if (debug) {
+        this.debugLog(`\u{1F3AF} Completed: ${result.stats.successful}/${result.stats.total} (${result.stats.duration}ms)`);
+      }
+    } catch (error) {
+      console.error("\u274C Bulk request failed:", error);
+      throw error;
+    } finally {
+      this.isProcessing = false;
+      this.debug = false;
+    }
+    return result;
+  }
+  async retryFailedIPs(options = {}) {
+    if (this.failedIPs.size === 0) {
+      throw new Error("No failed IPs to retry");
+    }
+    const failedIPsArray = Array.from(this.failedIPs);
+    this.addIPs(failedIPsArray);
+    return this.bulkRequest(options);
+  }
+  getStats() {
+    return {
+      totalIPs: this.ips.size,
+      failedIPs: this.failedIPs.size,
+      isProcessing: this.isProcessing,
+      lastRequestTime: this.lastRequestTime ? new Date(this.lastRequestTime) : null,
+      requestCount: this.requestCount
+    };
+  }
+};
 export {
+  FetchGeolocation,
   IOF,
   Logger,
   Terminal,
   TerminalColors,
   Time,
+  UAParser,
+  collectAnalytics,
+  getLocationFromIP,
   mimeType,
   terminal
 };

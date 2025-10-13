@@ -192,6 +192,209 @@ interface LogReturn {
      */
     level: string;
 }
+/**
+ * DeviceInfo interface represents detailed information about a user's device.
+ * It includes properties such as browser name and version, operating system and version,
+ * device type, brand, model, and flags indicating if the device is mobile or a bot.
+ */
+interface DeviceInfo {
+    /**
+     * The name of the browser (e.g., "Chrome", "Firefox").
+     * This property can be null if the browser information is not available.
+     */
+    browser: string | null;
+    /**
+     * The version of the browser (e.g., "89.0.4389.90").
+     * This property can be null if the browser version information is not available.
+     */
+    browserVersion: string | null;
+    /**
+     * The name of the operating system (e.g., "Windows", "macOS").
+     * This property can be null if the operating system information is not available.
+     */
+    operatingSystem: string | null;
+    /**
+     * The version of the operating system (e.g., "10", "11").
+     * This property can be null if the operating system version information is not available.
+     */
+    osVersion: string | null;
+    /**
+     * The type of device (e.g., "mobile", "tablet", "desktop").
+     * This property can be null if the device type information is not available.
+     */
+    deviceType: string | null;
+    /**
+     * The brand of the device (e.g., "Apple", "Samsung").
+     * This property can be null if the device brand information is not available.
+     */
+    deviceBrand: string | null;
+    /**
+     * The model of the device (e.g., "iPhone X", "Galaxy S10").
+     * This property can be null if the device model information is not available.
+     */
+    deviceModel: string | null;
+    /**
+     * Indicates whether the device is a mobile device.
+     * This property is a boolean value.
+     */
+    isMobile: boolean;
+    /**
+     * Indicates whether the device is identified as a bot.
+     * This property is a boolean value.
+     */
+    isBot: boolean;
+}
+/**
+ * Metadata interface represents comprehensive tracking information for a request or session.
+ * It includes IP and location data, user agent details, request headers, and session information.
+ */
+interface Metadata {
+    /** The IP address of the client. */
+    ip?: string;
+    /** The IP version (IPv4 or IPv6). */
+    ipVersion?: string;
+    /** The country name. */
+    country?: string;
+    /** The ISO country code. */
+    countryCode?: string;
+    /** The region/state. */
+    region?: string;
+    /** The full region name. */
+    regionName?: string;
+    /** The city name. */
+    city?: string;
+    /** The postal/ZIP code. */
+    zip?: string;
+    /** The latitude coordinate. */
+    latitude?: number;
+    /** The longitude coordinate. */
+    longitude?: number;
+    /** The timezone. */
+    timezone?: string;
+    /** The Internet Service Provider. */
+    isp?: string;
+    /** The organization name. */
+    organization?: string;
+    /** The full user agent string. */
+    userAgent?: string;
+    /** The browser name. */
+    browser: string | null;
+    /** The browser version. */
+    browserVersion: string | null;
+    /** The operating system name. */
+    operatingSystem: string | null;
+    /** The operating system version. */
+    osVersion: string | null;
+    /** The device type (desktop, mobile, tablet). */
+    deviceType: string | null;
+    /** The device brand. */
+    deviceBrand: string | null;
+    /** The device model. */
+    deviceModel: string | null;
+    /** Indicates if the device is mobile. */
+    isMobile: boolean;
+    /** Indicates if the client is identified as a bot. */
+    isBot: boolean;
+    /** The Accept-Language header value. */
+    acceptLanguage: string | null;
+    /** The Accept-Encoding header value. */
+    acceptEncoding: string | null;
+    /** The Accept-Charset header value. */
+    acceptCharset: string | null;
+    /** The Cache-Control header value. */
+    cacheControl: string | null;
+    /** The Connection header value. */
+    connection: string | null;
+    /** The Do Not Track (DNT) header value. */
+    dnt: string | null;
+    /** The Upgrade-Insecure-Requests header value. */
+    upgradeInsecure: string | null;
+    /** The referrer URL. */
+    referrer: string | null;
+    /** The referrer domain. */
+    referrerDomain: string | null;
+    /** The session identifier. */
+    sessionId?: string;
+    /** The browser fingerprint. */
+    fingerprint?: string;
+    /** The HTTP request method (GET, POST, etc). */
+    requestMethod?: string;
+    /** The full request URL. */
+    requestUrl?: string;
+    /** The request path. */
+    requestPath?: string;
+    /** The query parameters as JSON string. */
+    queryParams?: string;
+    /** The protocol (HTTP/HTTPS). */
+    protocol?: string;
+    /** The port number. */
+    port: number | null;
+    /** The timestamp when the metadata was created. */
+    createdAt: Date;
+}
+/**
+ * ParsedUserAgent interface represents the structured result of parsing a user agent string.
+ * It includes details about the browser, operating system, device, CPU architecture, and additional flags.
+ */
+interface ParsedUserAgent {
+    browser: {
+        name: string | null;
+        version: string | null;
+        major: string | null;
+        engine: string | null;
+    };
+    os: {
+        name: string | null;
+        version: string | null;
+        versionName: string | null;
+    };
+    device: {
+        type: string | null;
+        vendor: string | null;
+        model: string | null;
+    };
+    cpu: {
+        architecture: string | null;
+    };
+    extra: {
+        isMobile: boolean;
+        isTablet: boolean;
+        isDesktop: boolean;
+        isBot: boolean;
+        isTV: boolean;
+        isWearable: boolean;
+        isConsole: boolean;
+        isEmbedded: boolean;
+    };
+}
+/**
+ * LocationData interface represents geographical and network information for an IP address.
+ * It includes country, region, city details, coordinates, timezone, and ISP information.
+ */
+interface LocationData {
+    /** The country name. */
+    country: string;
+    /** The ISO country code. */
+    countryCode: string;
+    /** The region/state code. */
+    region: string;
+    /** The full region/state name. */
+    regionName: string;
+    /** The city name. */
+    city: string;
+    /** The postal/ZIP code. */
+    zip: string;
+    /** The latitude coordinate. */
+    lat: number;
+    /** The longitude coordinate. */
+    lon: number;
+    /** The timezone. */
+    timezone: string;
+    /** The Internet Service Provider. */
+    isp: string;
+    /** The organization name. */
+    org: string;
+}
 
 /**
  * IOF (Input/Output File) class provides methods for file and directory operations,
@@ -571,4 +774,189 @@ declare class Time {
     static getTimeToLogFormat(locale?: string | null, timeZone?: string | null): string;
 }
 
-export { FileType, IOF, type LogReturn, Logger, Terminal, type TerminalColor, TerminalColors, Time, mimeType, terminal };
+/**
+ * Fetch ip location from external service (ip-api.com)
+ *
+ * Free tier has rate limit 45 requests per minute
+ * ---
+ * For production use, consider using a paid service or self-hosted solution
+ */
+declare function getLocationFromIP(ip: string): Promise<LocationData | undefined>;
+/**
+ * Collect analytics metadata from the request
+ */
+declare function collectAnalytics(request: Request | any): Promise<Metadata | undefined>;
+
+/**
+ * Custom User Agent Parser - Comprehensive browser, OS, and device detection
+ * Built to replace ua-parser-js with more features and better performance
+ */
+declare class UAParser {
+    private userAgent;
+    private static browserPatterns;
+    private static osPatterns;
+    private static devicePatterns;
+    private static botPatterns;
+    private static cpuPatterns;
+    constructor(userAgent?: string);
+    /**
+     * Parse the user agent string and return detailed information
+     */
+    getResult(): ParsedUserAgent;
+    /**
+     * Parse browser information
+     */
+    private parseBrowser;
+    /**
+     * Parse operating system information
+     */
+    private parseOS;
+    /**
+     * Parse device information
+     */
+    private parseDevice;
+    /**
+     * Parse CPU architecture
+     */
+    private parseCPU;
+    /**
+     * Parse extra information and flags
+     */
+    private parseExtra;
+    /**
+     * Get OS version name based on version number
+     */
+    private getOSVersionName;
+    /**
+     * Extract device model from user agent
+     */
+    private extractDeviceModel;
+    /**
+     * Get detailed browser information
+     */
+    getBrowser(): {
+        name: string | null;
+        version: string | null;
+        major: string | null;
+        engine: string | null;
+    };
+    /**
+     * Get detailed OS information
+     */
+    getOS(): {
+        name: string | null;
+        version: string | null;
+        versionName: string | null;
+    };
+    /**
+     * Get detailed device information
+     */
+    getDevice(): {
+        type: string | null;
+        vendor: string | null;
+        model: string | null;
+    };
+    /**
+     * Get CPU architecture information
+     */
+    getCPU(): {
+        architecture: string | null;
+    };
+    /**
+     * Check if device is mobile
+     */
+    isMobile(): boolean;
+    /**
+     * Check if device is tablet
+     */
+    isTablet(): boolean;
+    /**
+     * Check if device is desktop
+     */
+    isDesktop(): boolean;
+    /**
+     * Check if user agent is a bot
+     */
+    isBot(): boolean;
+    /**
+     * Get formatted string representation
+     */
+    toString(): string;
+    /**
+     * Set user agent string
+     */
+    setUA(userAgent: string): UAParser;
+    /**
+     * Get current user agent string
+     */
+    getUA(): string;
+    /**
+     * Static method to quickly parse user agent
+     */
+    static parse(userAgent: string): ParsedUserAgent;
+}
+
+interface BulkRequestOptions {
+    batchSize?: number;
+    batchDelay?: number;
+    requestTimeout?: number;
+    maxRetries?: number;
+    debug?: boolean;
+    autoRetry?: boolean;
+    maxAutoRetries?: number;
+}
+interface BulkResult {
+    success: Array<{
+        ip: string;
+        data: LocationData;
+    }>;
+    failed: Array<{
+        ip: string;
+        error: string;
+    }>;
+    stats: {
+        total: number;
+        successful: number;
+        failed: number;
+        duration: number;
+        batchesProcessed: number;
+    };
+}
+declare class FetchGeolocation {
+    private ips;
+    private failedIPs;
+    private isProcessing;
+    private lastRequestTime;
+    private requestCount;
+    private readonly RATE_LIMIT_WINDOW;
+    private readonly MAX_REQUESTS_PER_MINUTE;
+    private debug;
+    private currentErrors;
+    setDebug(enabled: boolean): void;
+    private debugLog;
+    private debugUpdate;
+    private debugComplete;
+    private debugError;
+    addIPs(ips: string[]): void;
+    addIP(ip: string): void;
+    getIPs(): string[];
+    getFailedIPs(): string[];
+    clearIPs(): void;
+    clearSuccessfulIPs(): void;
+    private isValidIP;
+    private waitForRateLimit;
+    private sleep;
+    private sleepWithCountdown;
+    private processIP;
+    bulkRequest(options?: BulkRequestOptions): Promise<BulkResult>;
+    retryFailedIPs(options?: BulkRequestOptions): Promise<BulkResult>;
+    getStats(): {
+        totalIPs: number;
+        failedIPs: number;
+        isProcessing: boolean;
+        lastRequestTime: Date | null;
+        requestCount: number;
+    };
+}
+
+export { type DeviceInfo, FetchGeolocation, FileType, IOF, type LocationData, type LogReturn, Logger, type Metadata, type ParsedUserAgent, Terminal, type TerminalColor, TerminalColors, Time, UAParser, collectAnalytics, getLocationFromIP, mimeType, terminal };

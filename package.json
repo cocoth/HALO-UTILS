@@ -1,13 +1,25 @@
 {
   "name": "halo-utils",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
     "build:win": "rmdir /s /q dist && tsup",
-    "build:linux": "rm -rf dist && tsup"
+    "build:linux": "rm -rf dist && tsup",
+    "update-deps": "npm update",
+    "audit-fix": "npm audit fix --force",
+    "security-update": "npm audit fix && npm update",
+    "check-updates": "npx npm-check-updates",
+    "update-interactive": "npx npm-check-updates -i",
+    "update-patch": "npx npm-check-updates -t patch -u",
+    "update-minor": "npx npm-check-updates -t minor -u"
   },
-  "keywords": ["utils", "typescript", "nodejs", "library"],
+  "keywords": [
+    "utils",
+    "typescript",
+    "nodejs",
+    "library"
+  ],
   "author": "cocoth",
   "license": "ISC",
   "description": "A utility library for Node.js projects",
