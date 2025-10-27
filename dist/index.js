@@ -1195,7 +1195,7 @@ var UAParser = class _UAParser {
     { type: "tablet", vendor: "Asus", pattern: /ASUS Tablet\s?[A-Za-z0-9\-]+/ },
     { type: "tablet", vendor: "Google", pattern: /Nexus 7|Nexus 9|Pixel C/ },
     { type: "tablet", vendor: "Sony", pattern: /Xperia Tablet\s?[A-Za-z0-9\-]+/ },
-    { type: "tablet", vendor: "Acer", pattern: /Acer Iconia\s?[A-Za-z0-9\-]+/ },
+    // { type: 'tablet', vendor: 'Acer', pattern: /Acer Iconia\s?[A-Za-z0-9\-]+/ },
     { type: "tablet", vendor: "HP", pattern: /HP Slate\s?[A-Za-z0-9\-]+/ },
     { type: "tablet", vendor: "Dell", pattern: /Dell Venue\s?[A-Za-z0-9\-]+/ },
     { type: "tablet", vendor: "TCL", pattern: /TCL Tab\s?[A-Za-z0-9\-]+/ },
