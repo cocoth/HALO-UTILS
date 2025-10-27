@@ -988,7 +988,9 @@ var UAParser = class _UAParser {
   static browserPatterns = [
     // Modern browsers first (more specific)
     { name: "Edge", pattern: /\bEdg\/([\d\.]+)/, engine: "Blink" },
+    { name: "Edge (Legacy)", pattern: /\bEdge\/([\d\.]+)/, engine: "EdgeHTML" },
     { name: "Chrome", pattern: /\bChrome\/([\d\.]+)/, engine: "Blink" },
+    { name: "Chromium", pattern: /\bChromium\/([\d\.]+)/, engine: "Blink" },
     { name: "Firefox", pattern: /\bFirefox\/([\d\.]+)/, engine: "Gecko" },
     { name: "Safari", pattern: /\bVersion\/([\d\.]+).*Safari/, engine: "WebKit" },
     { name: "Opera", pattern: /\bOPR\/([\d\.]+)/, engine: "Blink" },
@@ -997,6 +999,14 @@ var UAParser = class _UAParser {
     { name: "UC Browser", pattern: /\bUCBrowser\/([\d\.]+)/, engine: "WebKit" },
     { name: "Brave", pattern: /\bBrave\/([\d\.]+)/, engine: "Blink" },
     { name: "Vivaldi", pattern: /\bVivaldi\/([\d\.]+)/, engine: "Blink" },
+    { name: "Yandex Browser", pattern: /\bYaBrowser\/([\d\.]+)/, engine: "Blink" },
+    { name: "QQ Browser", pattern: /\bQQBrowser\/([\d\.]+)/, engine: "Blink" },
+    { name: "Baidu Browser", pattern: /\bBaidu\/([\d\.]+)/, engine: "Blink" },
+    { name: "Maxthon", pattern: /\bMaxthon\/([\d\.]+)/, engine: "Blink" },
+    { name: "Puffin", pattern: /\bPuffin\/([\d\.]+)/, engine: "Blink" },
+    { name: "Coc Coc", pattern: /\bCocCocBrowser\/([\d\.]+)/, engine: "Blink" },
+    { name: "Sogou Explorer", pattern: /\bSE ([\d\.]+)/, engine: "WebKit" },
+    { name: "Sogou Mobile", pattern: /\bSogouMobileBrowser\/([\d\.]+)/, engine: "WebKit" },
     // Legacy browsers
     { name: "Internet Explorer", pattern: /\bMSIE\s([\d\.]+)/, engine: "Trident" },
     { name: "Internet Explorer", pattern: /\bTrident.*rv:([\d\.]+)/, engine: "Trident" },
@@ -1005,9 +1015,18 @@ var UAParser = class _UAParser {
     { name: "Chrome Mobile", pattern: /\bCrMo\/([\d\.]+)/, engine: "Blink" },
     { name: "Chrome Mobile", pattern: /\bCriOS\/([\d\.]+)/, engine: "WebKit" },
     { name: "Firefox Mobile", pattern: /\bFxiOS\/([\d\.]+)/, engine: "WebKit" },
+    { name: "Opera Mini", pattern: /\bOpera Mini\/([\d\.]+)/, engine: "Presto" },
+    { name: "Opera Mobile", pattern: /\bOpera Mobi\/([\d\.]+)/, engine: "Presto" },
+    { name: "MIUI Browser", pattern: /\bMiuiBrowser\/([\d\.]+)/, engine: "Blink" },
+    { name: "Huawei Browser", pattern: /\bHuaweiBrowser\/([\d\.]+)/, engine: "Blink" },
     // Webview and embedded
     { name: "Android WebView", pattern: /\bwv\).*Chrome\/([\d\.]+)/, engine: "Blink" },
-    { name: "WebView", pattern: /\bWebView\/([\d\.]+)/, engine: "WebKit" }
+    { name: "WebView", pattern: /\bWebView\/([\d\.]+)/, engine: "WebKit" },
+    // Others
+    { name: "Electron", pattern: /\bElectron\/([\d\.]+)/, engine: "Blink" },
+    { name: "PlayStation Browser", pattern: /\bPlayStation (\d+)\/([\d\.]+)/, engine: "WebKit" },
+    { name: "Nintendo Browser", pattern: /\bNintendoBrowser\/([\d\.]+)/, engine: "WebKit" },
+    { name: "Silk", pattern: /\bSilk\/([\d\.]+)/, engine: "WebKit" }
   ];
   // Operating System patterns
   static osPatterns = [
@@ -1019,6 +1038,11 @@ var UAParser = class _UAParser {
     { name: "Windows 7", pattern: /Windows NT 6\.1/ },
     { name: "Windows Vista", pattern: /Windows NT 6\.0/ },
     { name: "Windows XP", pattern: /Windows NT 5\.1/ },
+    { name: "Windows 2000", pattern: /Windows NT 5\.0/ },
+    { name: "Windows ME", pattern: /Windows 98; Win 9x 4\.90/ },
+    { name: "Windows 98", pattern: /Windows 98/ },
+    { name: "Windows 95", pattern: /Windows 95/ },
+    { name: "Windows NT", pattern: /Windows NT/ },
     // macOS versions
     { name: "macOS Sonoma", pattern: /Mac OS X 10[._]15|macOS.*14[._]\d+/ },
     { name: "macOS Ventura", pattern: /Mac OS X 10[._]15|macOS.*13[._]\d+/ },
@@ -1029,6 +1053,7 @@ var UAParser = class _UAParser {
     { name: "macOS High Sierra", pattern: /Mac OS X 10[._]13/ },
     { name: "macOS Sierra", pattern: /Mac OS X 10[._]12/ },
     { name: "Mac OS X", pattern: /Mac OS X ([\d\._]+)/ },
+    { name: "Mac OS", pattern: /Mac_PowerPC|Macintosh/ },
     // Linux distributions
     { name: "Ubuntu", pattern: /Ubuntu/ },
     { name: "Debian", pattern: /Debian/ },
@@ -1037,18 +1062,37 @@ var UAParser = class _UAParser {
     { name: "Fedora", pattern: /Fedora/ },
     { name: "SUSE", pattern: /SUSE/ },
     { name: "Arch Linux", pattern: /Arch/ },
+    { name: "Mint", pattern: /Linux Mint/ },
+    { name: "Gentoo", pattern: /Gentoo/ },
+    { name: "Kali Linux", pattern: /Kali/ },
+    { name: "Manjaro", pattern: /Manjaro/ },
+    { name: "elementary OS", pattern: /elementary/ },
+    { name: "Pop!_OS", pattern: /Pop!_OS/ },
     { name: "Linux", pattern: /Linux/ },
     // Mobile OS
     { name: "iOS", pattern: /(?:iPhone|iPad|iPod).*OS ([\d_]+)/ },
+    { name: "iPadOS", pattern: /iPad.*OS ([\d_]+)/ },
     { name: "Android", pattern: /Android ([\d\.]+)/ },
+    { name: "HarmonyOS", pattern: /HarmonyOS ([\d\.]+)/ },
+    { name: "KaiOS", pattern: /KaiOS\/([\d\.]+)/ },
     { name: "Windows Phone", pattern: /Windows Phone ([\d\.]+)/ },
     { name: "BlackBerry", pattern: /BlackBerry|BB10/ },
+    { name: "Symbian", pattern: /Symbian(OS)?\/([\d\.]+)/ },
+    { name: "webOS", pattern: /webOS\/([\d\.]+)/ },
+    { name: "Tizen", pattern: /Tizen\/([\d\.]+)/ },
+    { name: "Palm OS", pattern: /PalmOS/ },
     // Other OS
     { name: "Chrome OS", pattern: /CrOS/ },
     { name: "FreeBSD", pattern: /FreeBSD/ },
     { name: "OpenBSD", pattern: /OpenBSD/ },
     { name: "NetBSD", pattern: /NetBSD/ },
-    { name: "Solaris", pattern: /SunOS/ }
+    { name: "Solaris", pattern: /SunOS/ },
+    { name: "AIX", pattern: /AIX/ },
+    { name: "HP-UX", pattern: /HP-UX/ },
+    { name: "BeOS", pattern: /BeOS/ },
+    { name: "QNX", pattern: /QNX/ },
+    { name: "Haiku", pattern: /Haiku/ },
+    { name: "RISC OS", pattern: /RISC OS/ }
   ];
   // Device patterns
   static devicePatterns = [
@@ -1057,28 +1101,59 @@ var UAParser = class _UAParser {
     { type: "mobile", vendor: "Samsung", pattern: /SM-[A-Z]\d+/ },
     { type: "mobile", vendor: "Google", pattern: /Pixel/ },
     { type: "mobile", vendor: "OnePlus", pattern: /OnePlus/ },
-    { type: "mobile", vendor: "Xiaomi", pattern: /Mi\s|Redmi/ },
+    { type: "mobile", vendor: "Xiaomi", pattern: /Mi\s|Redmi|POCO/ },
     { type: "mobile", vendor: "Huawei", pattern: /HUAWEI|Honor/ },
     { type: "mobile", vendor: "LG", pattern: /LG-/ },
     { type: "mobile", vendor: "Sony", pattern: /Sony/ },
     { type: "mobile", vendor: "HTC", pattern: /HTC/ },
     { type: "mobile", vendor: "Motorola", pattern: /Moto/ },
+    { type: "mobile", vendor: "Oppo", pattern: /OPPO/ },
+    { type: "mobile", vendor: "Vivo", pattern: /Vivo/ },
+    { type: "mobile", vendor: "Realme", pattern: /Realme/ },
+    { type: "mobile", vendor: "Asus", pattern: /ASUS/ },
+    { type: "mobile", vendor: "Lenovo", pattern: /Lenovo/ },
+    { type: "mobile", vendor: "Meizu", pattern: /Meizu/ },
+    { type: "mobile", vendor: "ZTE", pattern: /ZTE/ },
+    { type: "mobile", vendor: "BlackBerry", pattern: /BlackBerry|BB10/ },
+    { type: "mobile", vendor: "Micromax", pattern: /Micromax/ },
+    { type: "mobile", vendor: "Tecno", pattern: /Tecno/ },
+    { type: "mobile", vendor: "Infinix", pattern: /Infinix/ },
+    { type: "mobile", vendor: "Alcatel", pattern: /Alcatel/ },
+    { type: "mobile", vendor: "Nokia", pattern: /Nokia/ },
     // Tablets
     { type: "tablet", vendor: "Apple", pattern: /iPad/ },
     { type: "tablet", vendor: "Samsung", pattern: /SM-T/ },
-    { type: "tablet", vendor: "Amazon", pattern: /Kindle|KFAPWI/ },
+    { type: "tablet", vendor: "Amazon", pattern: /Kindle|KFAPWI|Fire/ },
     { type: "tablet", vendor: "Microsoft", pattern: /Surface/ },
+    { type: "tablet", vendor: "Lenovo", pattern: /Lenovo Tab/ },
+    { type: "tablet", vendor: "Huawei", pattern: /MediaPad/ },
+    { type: "tablet", vendor: "Xiaomi", pattern: /Mi Pad/ },
+    { type: "tablet", vendor: "Asus", pattern: /ASUS Tablet/ },
     // Smart TVs
     { type: "smarttv", vendor: "Samsung", pattern: /SMART-TV|SmartTV/ },
     { type: "smarttv", vendor: "LG", pattern: /webOS/ },
     { type: "smarttv", vendor: "Sony", pattern: /SonyDTV/ },
+    { type: "smarttv", vendor: "Panasonic", pattern: /Panasonic/ },
+    { type: "smarttv", vendor: "Philips", pattern: /PhilipsTV/ },
+    { type: "smarttv", vendor: "TCL", pattern: /TCL/ },
+    { type: "smarttv", vendor: "Hisense", pattern: /Hisense/ },
+    { type: "smarttv", vendor: "Vizio", pattern: /Vizio/ },
     // Gaming consoles
     { type: "console", vendor: "Sony", pattern: /PlayStation/ },
     { type: "console", vendor: "Microsoft", pattern: /Xbox/ },
     { type: "console", vendor: "Nintendo", pattern: /Nintendo/ },
+    { type: "console", vendor: "Nvidia", pattern: /SHIELD/ },
     // Wearables
     { type: "wearable", vendor: "Apple", pattern: /Watch/ },
-    { type: "wearable", vendor: "Samsung", pattern: /SM-R/ }
+    { type: "wearable", vendor: "Samsung", pattern: /SM-R/ },
+    { type: "wearable", vendor: "Fitbit", pattern: /Fitbit/ },
+    { type: "wearable", vendor: "Garmin", pattern: /Garmin/ },
+    { type: "wearable", vendor: "Huawei", pattern: /Watch GT/ },
+    { type: "wearable", vendor: "Xiaomi", pattern: /Mi Watch/ },
+    // Embedded/IoT
+    { type: "embedded", vendor: "Raspberry Pi", pattern: /Raspberry Pi/ },
+    { type: "embedded", vendor: "Arduino", pattern: /Arduino/ },
+    { type: "embedded", vendor: "ESP32", pattern: /ESP32/ }
   ];
   // Bot patterns
   static botPatterns = [
@@ -1086,7 +1161,13 @@ var UAParser = class _UAParser {
     /googlebot|bingbot|slurp|duckduckbot/i,
     /facebookexternalhit|twitterbot|linkedinbot/i,
     /whatsapp|telegram|discord/i,
-    /headless|phantom|selenium|webdriver/i
+    /headless|phantom|selenium|webdriver/i,
+    /yandexbot|baiduspider|sogou|exabot|facebot|ia_archiver/i,
+    /mj12bot|semrushbot|ahrefsbot|pinterestbot|applebot/i,
+    /redditbot|snapchat|skypeuripreview|slackbot/i,
+    /curl|wget|httpclient|libwww-perl|python-requests|go-http-client/i,
+    /siteaudit|uptime|monitor|pingdom|datadog|newrelic/i,
+    /gptbot|openai|chatgpt|bard|gemini|claude|anthropic/i
   ];
   // CPU Architecture patterns
   static cpuPatterns = [
@@ -1096,7 +1177,18 @@ var UAParser = class _UAParser {
     { arch: "arm", pattern: /arm/i },
     { arch: "mips", pattern: /mips/i },
     { arch: "sparc", pattern: /sparc/i },
-    { arch: "ppc", pattern: /ppc|powerpc/i }
+    { arch: "ppc", pattern: /ppc|powerpc/i },
+    { arch: "riscv64", pattern: /riscv64/i },
+    { arch: "riscv", pattern: /riscv/i },
+    { arch: "s390x", pattern: /s390x/i },
+    { arch: "s390", pattern: /s390/i },
+    { arch: "alpha", pattern: /alpha/i },
+    { arch: "sh4", pattern: /sh4/i },
+    { arch: "m68k", pattern: /m68k/i },
+    { arch: "ia64", pattern: /ia64/i },
+    { arch: "loongarch64", pattern: /loongarch64/i },
+    { arch: "mips64", pattern: /mips64/i },
+    { arch: "sparc64", pattern: /sparc64/i }
   ];
   constructor(userAgent) {
     this.userAgent = userAgent || (typeof navigator !== "undefined" ? navigator.userAgent : "");
@@ -1203,12 +1295,12 @@ var UAParser = class _UAParser {
    * Parse extra information and flags
    */
   parseExtra() {
-    const isMobile = /Mobile|Android|iPhone|BlackBerry|Windows Phone/i.test(this.userAgent);
-    const isTablet = /iPad|Tablet|Kindle/i.test(this.userAgent);
-    const isTV = /TV|webOS|Tizen|SmartTV/i.test(this.userAgent);
-    const isWearable = /Watch|Wear/i.test(this.userAgent);
-    const isConsole = /PlayStation|Xbox|Nintendo/i.test(this.userAgent);
-    const isEmbedded = /Embedded|IoT|Smart/i.test(this.userAgent);
+    const isMobile = /Mobile|Android|iPhone|BlackBerry|Windows Phone|Opera Mini|Opera Mobi|FxiOS|CrMo|CriOS|MIUI|HuaweiBrowser|UCBrowser|SogouMobileBrowser|Puffin|QQBrowser|Baidu|Infinix|Tecno|Alcatel|Nokia|Lenovo|Realme|Vivo|OPPO|Meizu|ZTE|Micromax/i.test(this.userAgent);
+    const isTablet = /iPad|Tablet|Kindle|KFAPWI|Fire|SM-T|MediaPad|Mi Pad|Lenovo Tab|ASUS Tablet/i.test(this.userAgent);
+    const isTV = /TV|webOS|Tizen|SmartTV|SMART-TV|SonyDTV|Panasonic|PhilipsTV|TCL|Hisense|Vizio/i.test(this.userAgent);
+    const isWearable = /Watch|Wear|SM-R|Fitbit|Garmin|Watch GT|Mi Watch/i.test(this.userAgent);
+    const isConsole = /PlayStation|Xbox|Nintendo|SHIELD/i.test(this.userAgent);
+    const isEmbedded = /Embedded|IoT|Smart|Raspberry Pi|Arduino|ESP32/i.test(this.userAgent);
     const isBot = _UAParser.botPatterns.some((pattern) => pattern.test(this.userAgent));
     const isDesktop = !isMobile && !isTablet && !isTV && !isWearable && !isConsole && !isEmbedded;
     return {
@@ -1233,14 +1325,125 @@ var UAParser = class _UAParser {
         "16": "iOS 16",
         "15": "iOS 15",
         "14": "iOS 14",
-        "13": "iOS 13"
+        "13": "iOS 13",
+        "12": "iOS 12",
+        "11": "iOS 11",
+        "10": "iOS 10",
+        "9": "iOS 9",
+        "8": "iOS 8",
+        "7": "iOS 7",
+        "6": "iOS 6",
+        "5": "iOS 5"
       },
       "Android": {
-        "14": "Android 14",
+        "14": "Android 14 Upside Down Cake",
         "13": "Android 13 Tiramisu",
-        "12": "Android 12",
-        "11": "Android 11",
-        "10": "Android 10 Q"
+        "12": "Android 12 Snow Cone",
+        "11": "Android 11 Red Velvet Cake",
+        "10": "Android 10 Q",
+        "9": "Android 9 Pie",
+        "8": "Android 8 Oreo",
+        "7": "Android 7 Nougat",
+        "6": "Android 6 Marshmallow",
+        "5": "Android 5 Lollipop",
+        "4": "Android 4 Ice Cream Sandwich"
+      },
+      "Windows": {
+        "11": "Windows 11",
+        "10": "Windows 10",
+        "8": "Windows 8",
+        "7": "Windows 7",
+        "6": "Windows Vista",
+        "5": "Windows XP"
+      },
+      "macOS": {
+        "14": "macOS Sonoma",
+        "13": "macOS Ventura",
+        "12": "macOS Monterey",
+        "11": "macOS Big Sur",
+        "10": "macOS Catalina",
+        "9": "macOS Mojave",
+        "8": "macOS High Sierra",
+        "7": "macOS Sierra"
+      },
+      "Ubuntu": {
+        "22": "Ubuntu 22.04 Jammy Jellyfish",
+        "20": "Ubuntu 20.04 Focal Fossa",
+        "18": "Ubuntu 18.04 Bionic Beaver",
+        "16": "Ubuntu 16.04 Xenial Xerus"
+      },
+      "Debian": {
+        "12": "Debian 12 Bookworm",
+        "11": "Debian 11 Bullseye",
+        "10": "Debian 10 Buster",
+        "9": "Debian 9 Stretch",
+        "8": "Debian 8 Jessie"
+      },
+      "Fedora": {
+        "40": "Fedora 40",
+        "39": "Fedora 39",
+        "38": "Fedora 38",
+        "37": "Fedora 37"
+      },
+      "CentOS": {
+        "8": "CentOS 8",
+        "7": "CentOS 7",
+        "6": "CentOS 6"
+      },
+      "Red Hat": {
+        "9": "Red Hat Enterprise Linux 9",
+        "8": "Red Hat Enterprise Linux 8",
+        "7": "Red Hat Enterprise Linux 7"
+      },
+      "Arch Linux": {
+        "2024": "Arch Linux 2024",
+        "2023": "Arch Linux 2023",
+        "2022": "Arch Linux 2022"
+      },
+      "Mint": {
+        "21": "Linux Mint 21 Vanessa",
+        "20": "Linux Mint 20 Ulyana",
+        "19": "Linux Mint 19 Tara"
+      },
+      "elementary OS": {
+        "7": "elementary OS 7 Horus",
+        "6": "elementary OS 6 Odin",
+        "5": "elementary OS 5 Hera"
+      },
+      "Pop!_OS": {
+        "22": "Pop!_OS 22.04",
+        "21": "Pop!_OS 21.10",
+        "20": "Pop!_OS 20.04"
+      },
+      "Kali Linux": {
+        "2025": "Kali Linux 2025",
+        "2024": "Kali Linux 2024",
+        "2023": "Kali Linux 2023",
+        "2022": "Kali Linux 2022"
+      },
+      "Manjaro": {
+        "23": "Manjaro 23",
+        "22": "Manjaro 22",
+        "21": "Manjaro 21"
+      },
+      "Windows Phone": {
+        "10": "Windows 10 Mobile",
+        "8": "Windows Phone 8",
+        "7": "Windows Phone 7"
+      },
+      "HarmonyOS": {
+        "4": "HarmonyOS 4",
+        "3": "HarmonyOS 3",
+        "2": "HarmonyOS 2"
+      },
+      "KaiOS": {
+        "3": "KaiOS 3",
+        "2": "KaiOS 2"
+      },
+      "webOS": {
+        "3": "webOS 3",
+        "2": "webOS 2",
+        "1": "webOS 1"
       }
     };
     const majorVersion = version.split(".")[0];
@@ -1264,9 +1467,181 @@ var UAParser = class _UAParser {
         const match = this.userAgent.match(/iPad\d+,\d+/);
         return match ? match[0] : "iPad";
       }
+      if (type === "wearable") {
+        const match = this.userAgent.match(/Watch\d+,\d+/);
+        return match ? match[0] : "Apple Watch";
+      }
     }
     if (vendor === "Google") {
       const match = this.userAgent.match(/Pixel \d+[a-zA-Z]*/);
+      return match ? match[0] : null;
+    }
+    if (vendor === "OnePlus") {
+      const match = this.userAgent.match(/ONEPLUS\s?[A-Za-z0-9\-]+/);
+      return match ? match[0] : null;
+    }
+    if (vendor === "Xiaomi") {
+      const match = this.userAgent.match(/(Mi\s?[A-Za-z0-9\-]+|Redmi\s?[A-Za-z0-9\-]+|POCO\s?[A-Za-z0-9\-]+)/);
+      return match ? match[0] : null;
+    }
+    if (vendor === "Huawei") {
+      const match = this.userAgent.match(/(HUAWEI\s?[A-Za-z0-9\-]+|Honor\s?[A-Za-z0-9\-]+)/);
+      return match ? match[0] : null;
+    }
+    if (vendor === "LG") {
+      const match = this.userAgent.match(/LG-[A-Za-z0-9\-]+/);
+      return match ? match[0] : null;
+    }
+    if (vendor === "Sony") {
+      const match = this.userAgent.match(/Sony[A-Za-z0-9\-]+/);
+      return match ? match[0] : null;
+    }
+    if (vendor === "HTC") {
+      const match = this.userAgent.match(/HTC\s?[A-Za-z0-9\-]+/);
+      return match ? match[0] : null;
+    }
+    if (vendor === "Motorola") {
+      const match = this.userAgent.match(/Moto\s?[A-Za-z0-9\-]+/);
+      return match ? match[0] : null;
+    }
+    if (vendor === "Oppo") {
+      const match = this.userAgent.match(/OPPO\s?[A-Za-z0-9\-]+/);
+      return match ? match[0] : null;
+    }
+    if (vendor === "Vivo") {
+      const match = this.userAgent.match(/Vivo\s?[A-Za-z0-9\-]+/);
+      return match ? match[0] : null;
+    }
+    if (vendor === "Realme") {
+      const match = this.userAgent.match(/Realme\s?[A-Za-z0-9\-]+/);
+      return match ? match[0] : null;
+    }
+    if (vendor === "Asus") {
+      const match = this.userAgent.match(/ASUS\s?[A-Za-z0-9\-]+/);
+      return match ? match[0] : null;
+    }
+    if (vendor === "Lenovo") {
+      const match = this.userAgent.match(/Lenovo\s?[A-Za-z0-9\-]+/);
+      return match ? match[0] : null;
+    }
+    if (vendor === "Meizu") {
+      const match = this.userAgent.match(/Meizu\s?[A-Za-z0-9\-]+/);
+      return match ? match[0] : null;
+    }
+    if (vendor === "ZTE") {
+      const match = this.userAgent.match(/ZTE\s?[A-Za-z0-9\-]+/);
+      return match ? match[0] : null;
+    }
+    if (vendor === "BlackBerry") {
+      const match = this.userAgent.match(/(BlackBerry\s?[A-Za-z0-9\-]+|BB10)/);
+      return match ? match[0] : null;
+    }
+    if (vendor === "Micromax") {
+      const match = this.userAgent.match(/Micromax\s?[A-Za-z0-9\-]+/);
+      return match ? match[0] : null;
+    }
+    if (vendor === "Tecno") {
+      const match = this.userAgent.match(/Tecno\s?[A-Za-z0-9\-]+/);
+      return match ? match[0] : null;
+    }
+    if (vendor === "Infinix") {
+      const match = this.userAgent.match(/Infinix\s?[A-Za-z0-9\-]+/);
+      return match ? match[0] : null;
+    }
+    if (vendor === "Alcatel") {
+      const match = this.userAgent.match(/Alcatel\s?[A-Za-z0-9\-]+/);
+      return match ? match[0] : null;
+    }
+    if (vendor === "Nokia") {
+      const match = this.userAgent.match(/Nokia\s?[A-Za-z0-9\-]+/);
+      return match ? match[0] : null;
+    }
+    if (vendor === "Amazon" && type === "tablet") {
+      const match = this.userAgent.match(/(Kindle|KFAPWI|Fire\s?[A-Za-z0-9\-]+)/);
+      return match ? match[0] : null;
+    }
+    if (vendor === "Microsoft" && type === "tablet") {
+      const match = this.userAgent.match(/Surface\s?[A-Za-z0-9\-]+/);
+      return match ? match[0] : null;
+    }
+    if (vendor === "Lenovo" && type === "tablet") {
+      const match = this.userAgent.match(/Lenovo Tab\s?[A-Za-z0-9\-]+/);
+      return match ? match[0] : null;
+    }
+    if (vendor === "Huawei" && type === "tablet") {
+      const match = this.userAgent.match(/MediaPad\s?[A-Za-z0-9\-]+/);
+      return match ? match[0] : null;
+    }
+    if (vendor === "Xiaomi" && type === "tablet") {
+      const match = this.userAgent.match(/Mi Pad\s?[A-Za-z0-9\-]+/);
+      return match ? match[0] : null;
+    }
+    if (vendor === "Asus" && type === "tablet") {
+      const match = this.userAgent.match(/ASUS Tablet\s?[A-Za-z0-9\-]+/);
+      return match ? match[0] : null;
+    }
+    if (type === "smarttv") {
+      const match = this.userAgent.match(/(SMART-TV|SmartTV|webOS|SonyDTV|Panasonic|PhilipsTV|TCL|Hisense|Vizio)/);
+      return match ? match[0] : null;
+    }
+    if (type === "console") {
+      const match = this.userAgent.match(/(PlayStation\s?[A-Za-z0-9\-]+|Xbox\s?[A-Za-z0-9\-]+|Nintendo\s?[A-Za-z0-9\-]+|SHIELD)/);
+      return match ? match[0] : null;
+    }
+    if (type === "wearable") {
+      const match = this.userAgent.match(/(Watch\s?[A-Za-z0-9\-]+|SM-R\s?[A-Za-z0-9\-]+|Fitbit\s?[A-Za-z0-9\-]+|Garmin\s?[A-Za-z0-9\-]+|Watch GT\s?[A-Za-z0-9\-]+|Mi Watch\s?[A-Za-z0-9\-]+)/);
+      return match ? match[0] : null;
+    }
+    if (type === "embedded") {
+      const match = this.userAgent.match(/(Raspberry Pi\s?[A-Za-z0-9\-]+|Arduino\s?[A-Za-z0-9\-]+|ESP32\s?[A-Za-z0-9\-]+)/);
+      return match ? match[0] : null;
+    }
+    if (vendor === "Google" && /CrOS/.test(this.userAgent)) {
+      const match = this.userAgent.match(/CrOS\s+[A-Za-z0-9\-]+/);
+      return match ? match[0] : "Chromebook";
+    }
+    if (vendor === "Microsoft" && /Surface/.test(this.userAgent)) {
+      const match = this.userAgent.match(/Surface\s?(Book|Laptop|Pro)?\s?[A-Za-z0-9\-]*/);
+      return match ? match[0] : "Surface";
+    }
+    if (vendor === "HP") {
+      const match = this.userAgent.match(/HP\s?[A-Za-z0-9\-]+/);
+      return match ? match[0] : null;
+    }
+    if (vendor === "Dell") {
+      const match = this.userAgent.match(/Dell\s?[A-Za-z0-9\-]+/);
+      return match ? match[0] : null;
+    }
+    if (vendor === "Acer") {
+      const match = this.userAgent.match(/Acer\s?[A-Za-z0-9\-]+/);
+      return match ? match[0] : null;
+    }
+    if (vendor === "Razer") {
+      const match = this.userAgent.match(/Razer\s?[A-Za-z0-9\-]+/);
+      return match ? match[0] : null;
+    }
+    if (vendor === "MSI") {
+      const match = this.userAgent.match(/MSI\s?[A-Za-z0-9\-]+/);
+      return match ? match[0] : null;
+    }
+    if (vendor === "Alienware") {
+      const match = this.userAgent.match(/Alienware\s?[A-Za-z0-9\-]+/);
+      return match ? match[0] : null;
+    }
+    if (vendor === "Google" && /Nest/.test(this.userAgent)) {
+      const match = this.userAgent.match(/Nest\s?[A-Za-z0-9\-]+/);
+      return match ? match[0] : "Nest";
+    }
+    if (vendor === "Amazon" && /Echo/.test(this.userAgent)) {
+      const match = this.userAgent.match(/Echo\s?[A-Za-z0-9\-]+/);
+      return match ? match[0] : "Echo";
+    }
+    if (vendor === "Sonos") {
+      const match = this.userAgent.match(/Sonos\s?[A-Za-z0-9\-]+/);
+      return match ? match[0] : null;
+    }
+    if (vendor === "Bose") {
+      const match = this.userAgent.match(/Bose\s?[A-Za-z0-9\-]+/);
       return match ? match[0] : null;
     }
     return null;
