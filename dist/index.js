@@ -1187,7 +1187,6 @@ var UAParser = class _UAParser {
     // Tablets (expanded)
     { type: "tablet", vendor: "Apple", pattern: /iPad\d*,\d*|iPad/ },
     { type: "tablet", vendor: "Samsung", pattern: /SM-T\d+[A-Z]?|Galaxy Tab\s?[A-Za-z0-9\-]+/ },
-    // { type: 'tablet', vendor: 'Amazon', pattern: /Kindle|KFAPWI|Fire Tablet|Fire\s?[A-Za-z0-9\-]+/ },
     { type: "tablet", vendor: "Microsoft", pattern: /Surface(?!.*Aspire)/ },
     { type: "tablet", vendor: "Lenovo", pattern: /Lenovo Tab\s?[A-Za-z0-9\-]+/ },
     { type: "tablet", vendor: "Huawei", pattern: /MediaPad\s?[A-Za-z0-9\-]+/ },
@@ -1400,7 +1399,7 @@ var UAParser = class _UAParser {
    */
   parseExtra() {
     const isMobile = /Mobile|Android|iPhone|BlackBerry|Windows Phone|Opera Mini|Opera Mobi|FxiOS|CrMo|CriOS|MIUI|HuaweiBrowser|UCBrowser|SogouMobileBrowser|Puffin|QQBrowser|Baidu|Infinix|Tecno|Alcatel|Nokia|Lenovo|Realme|Vivo|OPPO|Meizu|ZTE|Micromax/i.test(this.userAgent);
-    const isTablet = /iPad|Tablet|Kindle|KFAPWI|Fire|SM-T|MediaPad|Mi Pad|Lenovo Tab|ASUS Tablet/i.test(this.userAgent);
+    const isTablet = /iPad|Tablet|SM-T|MediaPad|Mi Pad|Lenovo Tab|ASUS Tablet/i.test(this.userAgent);
     const isTV = /TV|webOS|Tizen|SmartTV|SMART-TV|SonyDTV|Panasonic|PhilipsTV|TCL|Hisense|Vizio/i.test(this.userAgent);
     const isWearable = /Watch|Wear|SM-R|Fitbit|Garmin|Watch GT|Mi Watch/i.test(this.userAgent);
     const isConsole = /PlayStation|Xbox|Nintendo|SHIELD/i.test(this.userAgent);
