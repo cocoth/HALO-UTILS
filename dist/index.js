@@ -38,8 +38,10 @@ __export(index_exports, {
   Time: () => Time,
   UAParser: () => UAParser,
   collectAnalytics: () => collectAnalytics,
+  getIpInfo: () => getIpInfo,
   getLocationFromIP: () => getLocationFromIP,
   mimeType: () => mimeType,
+  parseUserAgent: () => parseUserAgent,
   terminal: () => terminal
 });
 module.exports = __toCommonJS(index_exports);
@@ -2258,8 +2260,10 @@ var FetchGeolocation = class {
   Time,
   UAParser,
   collectAnalytics,
+  getIpInfo,
   getLocationFromIP,
   mimeType,
+  parseUserAgent,
   terminal
 });
 //# sourceMappingURL=index.js.map

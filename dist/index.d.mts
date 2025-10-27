@@ -775,6 +775,17 @@ declare class Time {
 }
 
 /**
+ * User agent parser to extract device and browser information
+ */
+declare function parseUserAgent(userAgent: string): DeviceInfo;
+/**
+ * Extract IP address and version from request headers
+ */
+declare function getIpInfo(request: Request): {
+    ip: string;
+    ipVersion: string;
+};
+/**
  * Fetch ip location from external service (ip-api.com)
  *
  * Free tier has rate limit 45 requests per minute
@@ -959,4 +970,4 @@ declare class FetchGeolocation {
     };
 }
 
-export { type DeviceInfo, FetchGeolocation, FileType, IOF, type LocationData, type LogReturn, Logger, type Metadata, type ParsedUserAgent, Terminal, type TerminalColor, TerminalColors, Time, UAParser, collectAnalytics, getLocationFromIP, mimeType, terminal };
+export { type DeviceInfo, FetchGeolocation, FileType, IOF, type LocationData, type LogReturn, Logger, type Metadata, type ParsedUserAgent, Terminal, type TerminalColor, TerminalColors, Time, UAParser, collectAnalytics, getIpInfo, getLocationFromIP, mimeType, parseUserAgent, terminal };

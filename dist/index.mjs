@@ -2211,8 +2211,10 @@ export {
   Time,
   UAParser,
   collectAnalytics,
+  getIpInfo,
   getLocationFromIP,
   mimeType,
+  parseUserAgent,
   terminal
 };
 //# sourceMappingURL=index.mjs.map
